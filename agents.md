@@ -53,6 +53,7 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
 - **Error response**: The RestControllerAdvice class, must response with a DTO and the attributes `code`, `message`
 - **Schema update**: Changed `buy_date` from `time` to `timestamp` in `schema.sql` to correctly store `LocalDateTime`.
 - **Use Case Registration**: Created `RegisterMaterialUseCase` and its implementation `RegisterMaterialService`, along with the adapters `MaterialController` and `MaterialPersistenceAdapter`.
+- **DTOs**: must be java Record.
 
 ## 4. Notes and Bugs
 *Note here if business information is missing, if there is a bug in Docker, or if there are any pending dependencies.*
