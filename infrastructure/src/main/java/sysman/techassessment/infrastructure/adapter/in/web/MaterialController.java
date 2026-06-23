@@ -50,9 +50,13 @@ public class MaterialController {
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public MaterialResponseDto updateAccount(@PathVariable Long id,
-                                                  @RequestBody UpdateMaterialRequestDTO request) {
-        return null;
+    @Operation(summary = "Update an existing Material")
+    public MaterialResponseDto updateAccount(@PathVariable Integer id,
+                                             @Valid @RequestBody MaterialRequestDto request) {
+        City city = citySPI.search(request.cityCode());
+        Material materialUpdate = materialMapper.toDomain(request);
+        Material updatedMaterial = materialSPI.update(id, materialUpdate);
+        return materialMapper.toDto(updatedMaterial, city);
     }
 
     @GetMapping

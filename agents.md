@@ -41,7 +41,9 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
 
 - [x] Register new material:
     - Follow Hexagonal layers. Remember business rules. Remember create DTOS for request and response.
-
+- [x] Update material: 
+  - Only can be updted material that exist and be in a state different from INACTIVE
+  - the ID can't be updated, this is the key to update.
 
 ## 3. Technical Decisions Made
 *Record here any significant changes to the code, custom exceptions, mappers, or design patterns used.*
@@ -51,9 +53,12 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
     - Controllers class shouldn't create logic, they just call methods from class from it depends
     - Controllers methods must be annotated with tag `@ResponseStatus` an the corresponding status.
 - **Error response**: The RestControllerAdvice class, must response with a DTO and the attributes `code`, `message`
+- **Update Material**: Added `findById` to `MaterialIRepository` and `update` logic to `MaterialService`. Ensured a material cannot be updated if it is `INACTIVE` or does not exist.
 - **Schema update**: Changed `buy_date` from `time` to `timestamp` in `schema.sql` to correctly store `LocalDateTime`.
 - **Use Case Registration**: Created `RegisterMaterialUseCase` and its implementation `RegisterMaterialService`, along with the adapters `MaterialController` and `MaterialPersistenceAdapter`.
 - **DTOs**: must be java Record.
+- **Unit test**: all services and models must have unit  test. 
+- **Integration test**: All functionality in Controller class must have integration test. 
 
 ## 4. Notes and Bugs
 *Note here if business information is missing, if there is a bug in Docker, or if there are any pending dependencies.*

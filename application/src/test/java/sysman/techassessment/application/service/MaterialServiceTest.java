@@ -93,4 +93,45 @@ class MaterialServiceTest {
         verify(materialIRepository, times(1)).findMaterial("Cemento");
         verify(materialIRepository, never()).save(any(Material.class));
     }
+
+    @Test
+    void testUpdateSuccess() {
+        Material existing = new Material();
+        existing.setId(1);
+        existing.setName("Arena");
+        existing.setState(MaterialState.AVAILABLE);
+
+        Material updateReq = new Material();
+        updateReq.setPrice(new BigDecimal("30000"));
+
+        when(materialIRepository.findById(1)).thenReturn(existing);
+        when(materialIRepository.save(any(Material.class))).thenAnswer(i -> i.getArgument(0));
+
+        Material result = materialService.update(1, updateReq);
+
+        assertEquals(new BigDecimal("30000"), result.getPrice());
+        assertEquals("Arena", result.getName());
+        verify(materialIRepository).findById(1);
+        verify(materialIRepository).save(existing);
+    }
+
+    @Test
+    void testUpdateThrowsExceptionIfNotFound() {
+        when(materialIRepository.findById(1)).thenReturn(null);
+
+        Material updateReq = new Material();
+        assertThrows(sysman.techassessment.domain.exception.BusinessDomainException.class, () -> materialService.update(1, updateReq));
+    }
+
+    @Test
+    void testUpdateThrowsExceptionIfInactive() {
+        Material existing = new Material();
+        existing.setId(1);
+        existing.setState(MaterialState.INACTIVE);
+
+        when(materialIRepository.findById(1)).thenReturn(existing);
+
+        Material updateReq = new Material();
+        assertThrows(sysman.techassessment.domain.exception.BusinessDomainException.class, () -> materialService.update(1, updateReq));
+    }
 }

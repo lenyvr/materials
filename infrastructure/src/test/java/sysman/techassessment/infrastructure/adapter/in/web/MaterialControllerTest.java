@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,7 +21,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -118,5 +119,56 @@ class MaterialControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testUpdateMaterialReturnsOk() throws Exception {
+        MaterialRequestDto updateReq = new MaterialRequestDto(
+                "Ladrillo update",
+                null,
+                "Construccion",
+                new BigDecimal("1500"),
+                null,
+                null,
+                "BOG",
+                null
+        );
+
+        Material materialToUpdate = new Material();
+        materialToUpdate.setName("Ladrillo update");
+
+        Material updatedMaterial = new Material();
+        updatedMaterial.setId(1);
+        updatedMaterial.setName("Ladrillo update");
+        updatedMaterial.setCityCode("BOG");
+
+        City city = new City();
+        city.setCode("BOG");
+        city.setName("Bogotá");
+
+        CityDto cityDto = new CityDto("BOG", "Bogotá");
+
+        MaterialResponseDto responseDto = new MaterialResponseDto(
+                1,
+                "Ladrillo update",
+                null,
+                "Construccion",
+                new BigDecimal("1500"),
+                null,
+                null,
+                cityDto,
+                MaterialState.AVAILABLE
+        );
+
+        when(materialMapper.toDomain(any(MaterialRequestDto.class))).thenReturn(materialToUpdate);
+        when(materialSPI.update(eq(1), any(Material.class))).thenReturn(updatedMaterial);
+        when(citySPI.search("BOG")).thenReturn(city);
+        when(materialMapper.toDto(any(Material.class), any(City.class))).thenReturn(responseDto);
+
+        mockMvc.perform(patch("/api/v1/materials/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateReq)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Ladrillo update"));
     }
 }
