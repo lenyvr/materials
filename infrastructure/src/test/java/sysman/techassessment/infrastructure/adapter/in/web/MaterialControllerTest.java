@@ -12,6 +12,7 @@ import sysman.techassessment.application.usecase.MaterialSPI;
 import sysman.techassessment.domain.model.City;
 import sysman.techassessment.domain.model.Material;
 import sysman.techassessment.domain.model.MaterialState;
+import sysman.techassessment.domain.model.PageResult;
 import sysman.techassessment.infrastructure.adapter.in.web.dto.CityDto;
 import sysman.techassessment.infrastructure.adapter.in.web.dto.MaterialRequestDto;
 import sysman.techassessment.infrastructure.adapter.in.web.dto.MaterialResponseDto;
@@ -19,6 +20,8 @@ import sysman.techassessment.infrastructure.adapter.in.web.mapper.MaterialMapper
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -26,6 +29,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -179,5 +183,43 @@ class MaterialControllerTest {
                 .content(objectMapper.writeValueAsString(updateReq)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Ladrillo update"));
+    }
+
+    @Test
+    void testListMaterialsReturnsOk() throws Exception {
+        Material material = new Material();
+        material.setId(1);
+        material.setName("Ladrillo");
+        material.setCityCode("BOG");
+        material.setState(MaterialState.AVAILABLE);
+        PageResult<Material> pageResult = new PageResult<>(Collections.singletonList(material), 1, 1, 0, 10);
+
+        City city = new City();
+        city.setName("Bogotá");
+
+        CityDto cityDto = new CityDto("BOG", "Bogotá");
+        MaterialResponseDto responseDto = new MaterialResponseDto(
+                1,
+                "Ladrillo",
+                "Ladrillo de arcilla",
+                "Construccion",
+                new BigDecimal("1200"),
+                null,
+                null,
+                cityDto,
+                MaterialState.AVAILABLE
+        );
+
+        when(citySPI.search("BOG")).thenReturn(city);
+        when(citySPI.searchByName(any())).thenReturn(null);
+        when(materialSPI.listMaterials(any(), any(), any(), any(), eq(0), eq(10))).thenReturn(pageResult);
+        when(materialMapper.toDto(any(Material.class), any(City.class))).thenReturn(responseDto);
+
+        mockMvc.perform(get("/api/v1/materials")
+                .param("page", "0")
+                .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].name").value("Ladrillo"))
+                .andExpect(jsonPath("$.totalElements").value(1));
     }
 }

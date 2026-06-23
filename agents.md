@@ -47,7 +47,7 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
 - [x] Delete material:
   - This is a soft delete, consist in change state to `INACTIVE`
   -  Only can be change the material state from those that exist and be in a state different from `INACTIVE`
-- [ ] List materials: 
+- [x] List materials: 
   - Only can be listed material with state different from `INACTIVE`.
   - The list must be paginated
   - there will be optionals filters: 
@@ -65,6 +65,7 @@ Always strictly follow Hexagonal Architecture principles (Domain, Application, I
 - **Error response**: The RestControllerAdvice class, must response with a DTO and the attributes `code`, `message`
 - **Update Material**: Added `findById` to `MaterialIRepository` and `update` logic to `MaterialService`. Ensured a material cannot be updated if it is `INACTIVE` or does not exist.
 - **Delete Material**: Implemented soft delete by changing the state to `INACTIVE`. Only allows deleting materials that exist and are not already `INACTIVE`.
+- **List Materials**: Added `PageResult` class in Domain layer for generic pagination. Implemented dynamic queries in `MaterialRepository` using `@Query` with parameters matching `type`, `startDate`, `endDate`, and `cityCode`. Mapped `city name` param to `city code` prior to searching. Mapped results to `PagedResponseDTO`.
 - **Schema update**: Changed `buy_date` from `time` to `timestamp` in `schema.sql` to correctly store `LocalDateTime`.
 - **Use Case Registration**: Created `RegisterMaterialUseCase` and its implementation `RegisterMaterialService`, along with the adapters `MaterialController` and `MaterialPersistenceAdapter`.
 - **DTOs**: must be java Record.
