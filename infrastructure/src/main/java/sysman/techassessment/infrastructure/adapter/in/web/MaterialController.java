@@ -40,8 +40,10 @@ public class MaterialController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public DeleteMaterialResponseDTO deactivateAccount(@PathVariable Long id) {
-        return new  DeleteMaterialResponseDTO("Material with id deleted successfully");
+    @Operation(summary = "Deactivate an existing Material")
+    public DeleteMaterialResponseDTO deactivateAccount(@PathVariable Integer id) {
+        Material material = materialSPI.delete(id);
+        return materialMapper.toDeleteDto(material);
     }
 
     @PatchMapping("/{id}")
@@ -59,7 +61,8 @@ public class MaterialController {
     @ResponseStatus(HttpStatus.OK)
     public PagedResponseDTO<MaterialListItemDTO> listMaterial(
             @RequestParam(required = false) String type,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate buyDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startBuyDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endBuyDate,
             @RequestParam(required = false) String city,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {

@@ -93,6 +93,34 @@ class MaterialServiceTest {
     }
 
     @Test
+    void testDeleteSuccess() {
+        Material existing = new Material();
+        existing.setId(1);
+        existing.setState(MaterialState.AVAILABLE);
+
+        when(materialIRepository.findById(1)).thenReturn(existing);
+
+        materialService.delete(1);
+
+        assertEquals(MaterialState.INACTIVE, existing.getState());
+        verify(materialIRepository).save(existing);
+    }
+
+    @Test
+    void testDeleteThrowsExceptionIfNotFoundOrInactive() {
+        when(materialIRepository.findById(1)).thenReturn(null);
+
+        assertThrows(sysman.techassessment.domain.exception.BusinessDomainException.class, () -> materialService.delete(1));
+
+        Material existingInactive = new Material();
+        existingInactive.setId(2);
+        existingInactive.setState(MaterialState.INACTIVE);
+        when(materialIRepository.findById(2)).thenReturn(existingInactive);
+
+        assertThrows(sysman.techassessment.domain.exception.BusinessDomainException.class, () -> materialService.delete(2));
+    }
+
+    @Test
     void testUpdateSuccess() {
         Material existing = new Material();
         existing.setId(1);
