@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import sysman.techassessment.domain.model.City;
 import sysman.techassessment.domain.model.Material;
 import sysman.techassessment.infrastructure.adapter.in.web.dto.CityDto;
+import sysman.techassessment.infrastructure.adapter.in.web.dto.DeleteMaterialResponseDTO;
 import sysman.techassessment.infrastructure.adapter.in.web.dto.MaterialRequestDto;
 import sysman.techassessment.infrastructure.adapter.in.web.dto.MaterialResponseDto;
 import sysman.techassessment.infrastructure.adapter.out.persistence.entity.MaterialEntity;
@@ -76,5 +77,9 @@ public class MaterialMapper {
         material.setCityCode(entity.getCityCode());
         material.setState(entity.getState());
         return material;
+    }
+
+    public DeleteMaterialResponseDTO toDeleteDto(Material materialDomain) {
+        return  new DeleteMaterialResponseDTO(String.format("Material with name %s deleted successfully", materialDomain.getName()));
     }
 }

@@ -64,4 +64,14 @@ public class MaterialService implements MaterialSPI {
         return materialIRepository.save(existing);
     }
 
+    @Override
+    public Material delete(Integer id) {
+        Material existing = materialIRepository.findById(id);
+        if (existing == null || MaterialState.INACTIVE.equals(existing.getState())) {
+            throw new BusinessDomainException("El material no existe o ya está inactivo.");
+        }
+        existing.setState(MaterialState.INACTIVE);
+        return materialIRepository.save(existing);
+    }
+
 }
