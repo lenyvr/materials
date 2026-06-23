@@ -9,14 +9,10 @@ import sysman.techassessment.application.usecase.CitySPI;
 import sysman.techassessment.application.usecase.MaterialSPI;
 import sysman.techassessment.domain.model.City;
 import sysman.techassessment.domain.model.Material;
-import sysman.techassessment.domain.model.MaterialState;
 import sysman.techassessment.infrastructure.adapter.in.web.dto.*;
 import sysman.techassessment.infrastructure.adapter.in.web.mapper.MaterialMapper;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/materials")

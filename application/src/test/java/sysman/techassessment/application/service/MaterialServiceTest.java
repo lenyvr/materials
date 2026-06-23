@@ -12,11 +12,9 @@ import sysman.techassessment.domain.model.MaterialState;
 import sysman.techassessment.domain.port.out.MaterialIRepository;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -86,9 +84,9 @@ class MaterialServiceTest {
 
         when(materialIRepository.findMaterial("Cemento")).thenReturn(activeMaterial);
 
-        assertThrows(MaterialAlreadyExists.class, () -> {
-            materialService.register(material);
-        });
+        assertThrows(MaterialAlreadyExists.class, () ->
+            materialService.register(material)
+        );
 
         verify(materialIRepository, times(1)).findMaterial("Cemento");
         verify(materialIRepository, never()).save(any(Material.class));
