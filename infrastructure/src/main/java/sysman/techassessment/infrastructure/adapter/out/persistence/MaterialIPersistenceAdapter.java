@@ -33,4 +33,11 @@ public class MaterialIPersistenceAdapter implements MaterialIRepository {
         MaterialEntity materialEntity = repository.findByName(name).orElse(null);
         return mapper.toDomain(materialEntity);
     }
+
+    @Override
+    public Material findById(Integer id) {
+        if (id == null) return null;
+        MaterialEntity materialEntity = repository.findById(id).orElse(null);
+        return mapper.toDomain(materialEntity);
+    }
 }

@@ -1,6 +1,7 @@
 package sysman.techassessment.application.service;
 
 import sysman.techassessment.application.usecase.MaterialSPI;
+import sysman.techassessment.domain.exception.BusinessDomainException;
 import sysman.techassessment.domain.exception.MaterialAlreadyExists;
 import sysman.techassessment.domain.model.Material;
 import sysman.techassessment.domain.model.MaterialState;
@@ -42,6 +43,25 @@ public class MaterialService implements MaterialSPI {
         if (material.getState() == null) {
             material.setState(MaterialState.AVAILABLE);
         }
+    }
+
+    @Override
+    public Material update(Integer id, Material materialUpdate) {
+        Material existing = materialIRepository.findById(id);
+        if (existing == null || MaterialState.INACTIVE.equals(existing.getState())) {
+            throw new BusinessDomainException("El material a actualizar no existe.");
+        }
+
+        if (materialUpdate.getName() != null) existing.setName(materialUpdate.getName());
+        if (materialUpdate.getDescription() != null) existing.setDescription(materialUpdate.getDescription());
+        if (materialUpdate.getType() != null) existing.setType(materialUpdate.getType());
+        if (materialUpdate.getPrice() != null) existing.setPrice(materialUpdate.getPrice());
+        if (materialUpdate.getBuyDate() != null) existing.setBuyDate(materialUpdate.getBuyDate());
+        if (materialUpdate.getSoldDate() != null) existing.setSoldDate(materialUpdate.getSoldDate());
+        if (materialUpdate.getCityCode() != null) existing.setCityCode(materialUpdate.getCityCode());
+        if (materialUpdate.getState() != null) existing.setState(materialUpdate.getState());
+
+        return materialIRepository.save(existing);
     }
 
 }

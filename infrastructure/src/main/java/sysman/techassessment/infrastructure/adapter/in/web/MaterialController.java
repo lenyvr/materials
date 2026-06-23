@@ -9,14 +9,10 @@ import sysman.techassessment.application.usecase.CitySPI;
 import sysman.techassessment.application.usecase.MaterialSPI;
 import sysman.techassessment.domain.model.City;
 import sysman.techassessment.domain.model.Material;
-import sysman.techassessment.domain.model.MaterialState;
 import sysman.techassessment.infrastructure.adapter.in.web.dto.*;
 import sysman.techassessment.infrastructure.adapter.in.web.mapper.MaterialMapper;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/materials")
@@ -50,9 +46,13 @@ public class MaterialController {
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public MaterialResponseDto updateAccount(@PathVariable Long id,
-                                                  @RequestBody UpdateMaterialRequestDTO request) {
-        return null;
+    @Operation(summary = "Update an existing Material")
+    public MaterialResponseDto updateAccount(@PathVariable Integer id,
+                                             @Valid @RequestBody MaterialRequestDto request) {
+        City city = citySPI.search(request.cityCode());
+        Material materialUpdate = materialMapper.toDomain(request);
+        Material updatedMaterial = materialSPI.update(id, materialUpdate);
+        return materialMapper.toDto(updatedMaterial, city);
     }
 
     @GetMapping
