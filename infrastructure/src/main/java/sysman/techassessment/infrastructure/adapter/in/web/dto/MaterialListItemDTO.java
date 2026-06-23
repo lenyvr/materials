@@ -11,11 +11,9 @@ public record MaterialListItemDTO(
         String description,
         String type,
         Double price,
-        @JsonProperty("buy_date")
         LocalDateTime buyDate,
-        @JsonProperty("sold_date")
         LocalDateTime soldDate,
-        String city,
+        CityDto city,
         String state
 ) {
 }

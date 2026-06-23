@@ -4,6 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import sysman.techassessment.infrastructure.adapter.out.persistence.entity.CityEntity;
 
+import java.util.Optional;
+
 @Repository
 public interface CityRepository extends JpaRepository<CityEntity, String> {
+    Optional<CityEntity> findByNameIgnoreCase(String name);
 }

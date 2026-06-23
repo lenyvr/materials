@@ -4,4 +4,5 @@ import sysman.techassessment.domain.model.City;
 
 public interface CityIRepository {
     City getCity(String code);
+    City getCityByName(String name);
 }

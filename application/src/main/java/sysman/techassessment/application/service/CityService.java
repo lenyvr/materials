@@ -29,4 +29,12 @@ public class CityService implements CitySPI {
 
         return cityIRepository.getCity(code);
     }
+
+    @Override
+    public City searchByName(String name) {
+        if(Objects.isNull(name) || name.trim().isEmpty()){
+            return null;
+        }
+        return cityIRepository.getCityByName(name);
+    }
 }

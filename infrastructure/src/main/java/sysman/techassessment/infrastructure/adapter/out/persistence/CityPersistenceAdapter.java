@@ -26,4 +26,11 @@ public class CityPersistenceAdapter implements CityIRepository {
         CityEntity cityEntity = cityRepository.findById(code).orElse(null);
         return mapper.toDomainFromEntity(cityEntity);
     }
+
+    @Override
+    public City getCityByName(String name) {
+        if (Objects.isNull(name) || name.trim().isEmpty()) return null;
+        CityEntity cityEntity = cityRepository.findByNameIgnoreCase(name).orElse(null);
+        return mapper.toDomainFromEntity(cityEntity);
+    }
 }

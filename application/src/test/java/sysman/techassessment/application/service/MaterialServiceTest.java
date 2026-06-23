@@ -6,12 +6,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sysman.techassessment.application.usecase.CitySPI;
 import sysman.techassessment.domain.exception.MaterialAlreadyExists;
+import sysman.techassessment.domain.model.City;
 import sysman.techassessment.domain.model.Material;
 import sysman.techassessment.domain.model.MaterialState;
+import sysman.techassessment.domain.model.PageResult;
 import sysman.techassessment.domain.port.out.MaterialIRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -22,6 +27,9 @@ class MaterialServiceTest {
 
     @Mock
     private MaterialIRepository materialIRepository;
+
+    @Mock
+    private CitySPI citySPI;
 
     @InjectMocks
     private MaterialService materialService;
@@ -159,5 +167,21 @@ class MaterialServiceTest {
 
         Material updateReq = new Material();
         assertThrows(sysman.techassessment.domain.exception.BusinessDomainException.class, () -> materialService.update(1, updateReq));
+    }
+
+    @Test
+    void testListMaterialsSuccess() {
+        Material material = new Material();
+        material.setId(1);
+        material.setName("Ladrillo");
+        material.setCityCode("BOG");
+
+        PageResult<Material> pageResult = new PageResult<>(Collections.singletonList(material), 1, 1, 0, 10);
+        when(materialIRepository.listMaterials(any(), any(), any(), eq("BOG"), eq(0), eq(10))).thenReturn(pageResult);
+
+        PageResult<Material> result = materialService.listMaterials("Type", LocalDate.now(), LocalDate.now(), "BOG", 0, 10);
+
+        assertEquals(1, result.getContent().size());
+        verify(materialIRepository).listMaterials(any(), any(), any(), eq("BOG"), eq(0), eq(10));
     }
 }

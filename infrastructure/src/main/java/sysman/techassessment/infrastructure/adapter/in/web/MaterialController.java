@@ -11,8 +11,12 @@ import sysman.techassessment.domain.model.City;
 import sysman.techassessment.domain.model.Material;
 import sysman.techassessment.infrastructure.adapter.in.web.dto.*;
 import sysman.techassessment.infrastructure.adapter.in.web.mapper.MaterialMapper;
+import sysman.techassessment.domain.model.PageResult;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/materials")
@@ -42,8 +46,8 @@ public class MaterialController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Deactivate an existing Material")
     public DeleteMaterialResponseDTO deactivateAccount(@PathVariable Integer id) {
-        Material material = materialSPI.delete(id);
-        return materialMapper.toDeleteDto(material);
+        materialSPI.delete(id);
+        return new DeleteMaterialResponseDTO("Material with id " + id + " deleted successfully");
     }
 
     @PatchMapping("/{id}")
@@ -59,15 +63,30 @@ public class MaterialController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public PagedResponseDTO<MaterialListItemDTO> listMaterial(
+    @Operation(summary = "List Materials with pagination and filters")
+    public PagedResponseDTO<MaterialResponseDto> listMaterial(
             @RequestParam(required = false) String type,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startBuyDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endBuyDate,
             @RequestParam(required = false) String city,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
+        City cityFound = citySPI.searchByName(city);
+        PageResult<Material> result = materialSPI.listMaterials(type, startBuyDate, endBuyDate
+                , Objects.isNull(cityFound)?null:cityFound.getCode(), page, size);
 
-        return null;
+        List<MaterialResponseDto> responseDtoList = result.getContent().stream().map(m -> {
+            City c = citySPI.search(m.getCityCode());
+            return materialMapper.toDto(m, c);
+        }).collect(Collectors.toList());
+
+        return new PagedResponseDTO<>(
+                responseDtoList,
+                result.getTotalElements(),
+                result.getTotalPages(),
+                result.getCurrentPage(),
+                result.getPageSize()
+        );
     }
 
 

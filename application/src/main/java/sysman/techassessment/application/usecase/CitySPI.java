@@ -4,4 +4,5 @@ import sysman.techassessment.domain.model.City;
 
 public interface CitySPI {
     City search(String code);
+    City searchByName(String name);
 }

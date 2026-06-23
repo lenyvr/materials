@@ -5,8 +5,10 @@ import sysman.techassessment.domain.exception.BusinessDomainException;
 import sysman.techassessment.domain.exception.MaterialAlreadyExists;
 import sysman.techassessment.domain.model.Material;
 import sysman.techassessment.domain.model.MaterialState;
+import sysman.techassessment.domain.model.PageResult;
 import sysman.techassessment.domain.port.out.MaterialIRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -65,13 +67,27 @@ public class MaterialService implements MaterialSPI {
     }
 
     @Override
-    public Material delete(Integer id) {
+    public void delete(Integer id) {
         Material existing = materialIRepository.findById(id);
         if (existing == null || MaterialState.INACTIVE.equals(existing.getState())) {
             throw new BusinessDomainException("El material no existe o ya está inactivo.");
         }
         existing.setState(MaterialState.INACTIVE);
-        return materialIRepository.save(existing);
+        materialIRepository.save(existing);
+    }
+
+    @Override
+    public PageResult<Material> listMaterials(String type, LocalDate startBuyDate, LocalDate endBuyDate, String cityCode
+            , int page, int size) {
+        LocalDateTime startDateTime = startBuyDate != null ? startBuyDate.atStartOfDay() : null;
+        LocalDateTime endDateTime = endBuyDate != null ? endBuyDate.atTime(23, 59, 59) : null;
+
+        return materialIRepository.listMaterials( clearFilter(type)
+                , startDateTime, endDateTime, clearFilter(cityCode), page, size);
+    }
+
+    private String clearFilter(String filter) {
+       return Objects.isNull(filter) ? null: "%"+filter.trim().toLowerCase().concat("%");
     }
 
 }
